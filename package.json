@@ -17,6 +17,8 @@
     "dist",
     "src",
     "capabilities.json",
+    "tools",
+    "lexirise-baseline.json",
     "PROVENANCE.json",
     "README.md"
   ],
