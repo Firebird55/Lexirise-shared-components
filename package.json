@@ -3,6 +3,8 @@
   "version": "1.0.3",
   "type": "module",
   "private": true,
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "Firebird55",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -25,7 +27,9 @@
     "INSTALL.html",
     "AGENTS.md",
     "CONTRIBUTING.md",
-    "RELEASE.md"
+    "RELEASE.md",
+    "LICENSE",
+    "NOTICE.md"
   ],
   "scripts": {
     "build": "tsc",

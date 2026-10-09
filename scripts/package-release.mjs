@@ -11,7 +11,7 @@ if(pkg.name==='@firebird55/lexirise-components'){
  copyFileSync('capabilities.json','release/capabilities.json');
  writeFileSync('PROVENANCE.json',JSON.stringify(provenance,null,2)+'\n');
  const staged='release/package';mkdirSync(staged,{recursive:true});
- for(const path of ['dist','src','tools','capabilities.json','lexirise-baseline.json','PROVENANCE.json','README.md','INSTALL.md','INSTALL.html','AGENTS.md','CONTRIBUTING.md','RELEASE.md'])cpSync(path,staged+'/'+path,{recursive:true});
+ for(const path of ['dist','src','tools','capabilities.json','lexirise-baseline.json','PROVENANCE.json','README.md','INSTALL.md','INSTALL.html','AGENTS.md','CONTRIBUTING.md','RELEASE.md','LICENSE','NOTICE.md'])cpSync(path,staged+'/'+path,{recursive:true});
  const installable={...pkg};delete installable.devDependencies;delete installable.scripts;
  writeFileSync(staged+'/package.json',JSON.stringify(installable,null,2)+'\n');
  execFileSync('npm',['pack','./'+staged,'--ignore-scripts','--pack-destination','release'],{stdio:'inherit',shell:process.platform==='win32'});
@@ -28,7 +28,7 @@ if(pkg.name==='@firebird55/lexirise-components'){
  execFileSync('powershell',['-NoProfile','-Command',"$ErrorActionPreference='Stop'; Compress-Archive -LiteralPath '"+folder+"' -DestinationPath 'release/Game-immersion-toolkit-"+version+".zip'"],{stdio:'inherit'});
  execFileSync(process.execPath,['-e',"require('fs').unlinkSync('release/source.tar')"]);
 }
-for(const file of ['INSTALL.md','INSTALL.html','AGENTS.md','CONTRIBUTING.md'])copyFileSync(file,'release/'+file);
+for(const file of ['INSTALL.md','INSTALL.html','AGENTS.md','CONTRIBUTING.md','NOTICE.md'])copyFileSync(file,'release/'+file);
 const assets=readdirSync('release').filter(f=>statSync('release/'+f).isFile()&&f!=='SHA256SUMS');
 writeFileSync('release/SHA256SUMS',assets.map(f=>createHash('sha256').update(readFileSync('release/'+f)).digest('hex')+'  '+f).join('\n')+'\n');
 console.log('Release assets and SHA-256 checksums prepared for '+version+' @ '+sha);
