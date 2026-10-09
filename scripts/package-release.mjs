@@ -10,7 +10,11 @@ mkdirSync('release',{recursive:true});writeFileSync('release/PROVENANCE.json',JS
 if(pkg.name==='@firebird55/lexirise-components'){
  copyFileSync('capabilities.json','release/capabilities.json');
  writeFileSync('PROVENANCE.json',JSON.stringify(provenance,null,2)+'\n');
- execFileSync('npm',['pack','--ignore-scripts','--pack-destination','release'],{stdio:'inherit',shell:process.platform==='win32'});
+ const staged='release/package';mkdirSync(staged,{recursive:true});
+ for(const path of ['dist','src','tools','capabilities.json','lexirise-baseline.json','PROVENANCE.json','README.md'])cpSync(path,staged+'/'+path,{recursive:true});
+ const installable={...pkg};delete installable.devDependencies;delete installable.scripts;
+ writeFileSync(staged+'/package.json',JSON.stringify(installable,null,2)+'\n');
+ execFileSync('npm',['pack','./'+staged,'--ignore-scripts','--pack-destination','release'],{stdio:'inherit',shell:process.platform==='win32'});
  execFileSync('git',['archive','--format=zip','-o','release/lexirise-components-source-'+version+'.zip','HEAD']);
 }else if(pkg.name==='emulingo-lexirise'){
  copyFileSync('dist/emulingo-lexirise.user.js','release/emulingo-lexirise-'+version+'.user.js');
