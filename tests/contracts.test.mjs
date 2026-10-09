@@ -2,6 +2,14 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {settingsPatch, studyLanguages, capabilities, restoreLocalSettings, createLexiriseClient, countUnknownWords, toneStyle, MIGAKU_TONE_PALETTE} from '../dist/index.js';
+
+test('lookup uses requested translation language and falls back honestly to the API target',()=>{
+ const c=createLexiriseClient({sourceLanguage:'nl',translationLanguage:'fr',cacheScope:'translation-test',getValue:async(k,f)=>f,setValue:async()=>{},deleteValue:async()=>{},request:async()=>({status:200,response:{}})});
+ const raw={translations:[{target_lang:'en',translation:'hello'},{target_lang:'fr',translation:'bonjour'}],translation_target:'fr'};
+ assert.equal(c.normalizeLookup(raw).translations[0].meaning,'bonjour');
+ const fallback=c.normalizeLookup({translations:[{target_lang:'de',translation:'hallo'}],translation_target:'de'});
+ assert.equal(fallback.translations[0].meaning,'hallo');assert.equal(fallback.translationLanguage,'de');assert.equal(fallback.sourceLanguage,'nl');
+});
 const account=()=>({languages:['zh'],native_lang:'en',global:{translationLanguage:null, effectiveTranslationLanguage:'en',customProficiencyColors:{unknown:'amber',known:'green'}},languageSettings:{zh:{readingAid:'pinyin',toneColors:{1:'derived'}},nl:{fontSize:'md'}}});
 test('all 31 exact study languages have applicable language controls',()=>{
  assert.deepEqual(studyLanguages,'zh yue nan ja ko en es fr de it pt ru id ar hi ta th vi tr nl pl cs ro hu sv no da fi la grc lzh'.split(' '));
