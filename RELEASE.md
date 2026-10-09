@@ -2,6 +2,7 @@
 
 ## Development
 Install Node 24. Run npm ci and npm run check. Never edit generated consumer vendor copies.
+The source ZIP includes Install.cmd / npm run setup as a developer installer. It includes INSTALL.md, INSTALL.html, AGENTS.md and CONTRIBUTING.md. This library is not a standalone app and does not need game files. The installable package carries the same documentation.
 Keep credentials in the host application's DPAPI/userscript-manager storage.
 
 ## Shared release

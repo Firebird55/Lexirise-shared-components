@@ -20,7 +20,12 @@
     "tools",
     "lexirise-baseline.json",
     "PROVENANCE.json",
-    "README.md"
+    "README.md",
+    "INSTALL.md",
+    "INSTALL.html",
+    "AGENTS.md",
+    "CONTRIBUTING.md",
+    "RELEASE.md"
   ],
   "scripts": {
     "build": "tsc",
@@ -29,7 +34,8 @@
     "check": "npm run typecheck && npm test",
     "shared:update": "node scripts/shared-update.mjs",
     "release": "node scripts/release.mjs",
-    "lexirise:watch": "node scripts/lexirise-watch.mjs"
+    "lexirise:watch": "node scripts/lexirise-watch.mjs",
+    "setup": "node scripts/install.mjs"
   },
   "peerDependencies": {
     "react": ">=19.2.0",
