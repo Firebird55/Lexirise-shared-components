@@ -18,6 +18,8 @@ Run npm run lexirise:watch. The report in .watch/ covers API/AI docs and publicl
 After reviewed adaptations, run npm run lexirise:watch -- --record in the shared repository, test and commit the new baseline, release and update both apps. Agents in either consumer have the same command through the imported package.
 
 ## Rollback
+If publication failed after a tag was tested, repair the workflow on main, then run gh workflow run ci-release.yml --repo Firebird55/Lexirise-shared-components -f release_tag=<existing-tag>. The repair rebuilds that immutable tag and uploads only validated files; never move the tag.
+
 Install a prior shared version using shared:update --version <prior> --all, then release new consumer versions. Do not rewrite released tags. Local data and keys are outside the package and must be preserved.
 
 ## CI and assets

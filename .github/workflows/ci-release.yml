@@ -1,5 +1,11 @@
 name: Checks and release
 on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing release tag to rebuild without moving the tag
+        required: true
+        type: string
   push:
     branches: [main, 'codex/**']
     tags: ['v*']
@@ -13,6 +19,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ inputs.release_tag || github.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -26,9 +33,13 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: tested-release-assets
-          path: release/*
+          path: |
+            release/*.tgz
+            release/*.zip
+            release/*.json
+            release/SHA256SUMS
   publish:
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     needs: check
     runs-on: ubuntu-latest
     permissions:
@@ -42,4 +53,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: gh release create "${{ github.ref_name }}" release/* --verify-tag --title "${{ github.ref_name }}" --notes "Tested release; authenticated downloads required. See RELEASE.md."
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release/* --clobber
+          else
+            gh release create "$RELEASE_TAG" release/* --verify-tag --title "$RELEASE_TAG" --notes "Tested release; authenticated downloads required. See RELEASE.md."
+          fi
