@@ -354,7 +354,7 @@ function WordSheet({ id, text, token, lookup, lookupError, options, anchor, keyb
       </div>
       {saveError && <p className="word-sheet-error" role="alert">{saveError}</p>}
       <div className="word-tabs" role="tablist" aria-label="Word details">
-        {(['definition', 'grammar', 'context', 'examples', 'similar', 'components'] as const).map(value =>
+        {(['definition', 'grammar', 'context', 'examples', 'similar', 'components'] as const).filter(value => (value !== 'components' || capability.characters) && (value !== 'grammar' || capability.grammar)).map(value =>
           <button key={value} type="button" role="tab" aria-selected={tab === value}
             className={tab === value ? 'active' : ''} onClick={() => setTab(value)}>{value[0].toUpperCase() + value.slice(1)}</button>)}
       </div>

@@ -10,7 +10,7 @@ export function restoreTranslationLimit(value: unknown): TranslationLimit {
 export function countUnknownWords(text: string, tokens: {
   start: number; end: number; proficiency: number;
 }[]): number | null {
-  const han = /[\p{L}\p{N}]/u;
+  const han = /\p{L}/u;
   if (!han.test(text)) return null;
   let cursor = 0;
   let count = 0;

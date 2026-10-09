@@ -1,11 +1,11 @@
 /* Reader and popup styles adapted from the current Proxy Transcript. */
 :host { display:block; color:#f4f4f4; font-family:"Segoe UI","PingFang SC","Microsoft YaHei UI",sans-serif; }
-*,*::before,*::after { box-sizing:border-box; }
-button,input,select,textarea { font:inherit; }
-button { appearance:none; border:0; padding:0; background:transparent; color:inherit; }
-p { margin:0; }
-a { color:inherit; text-decoration:none; }
-svg { display:block; }
+:where(.settings-dialog,.word-sheet,.reading-text) * { box-sizing:border-box; }
+:where(.settings-dialog,.word-sheet) :is(button,input,select,textarea) { font:inherit; }
+:where(.settings-dialog,.word-sheet) button { appearance:none; border:0; padding:0; background:transparent; color:inherit; }
+:where(.settings-dialog,.word-sheet,.reading-text) p { margin:0; }
+:where(.settings-dialog,.word-sheet) a { color:inherit; text-decoration:none; }
+:where(.settings-dialog,.word-sheet) svg { display:block; }
 .current-chinese { color:#f2f5f7; font-size:var(--lexirise-font-size,27px); font-family:"PingFang SC","Microsoft YaHei UI","Noto Sans SC",sans-serif; }
 .reading-retry { display:block; font-size:12px; margin-top:6px; color:#ffc5c5; cursor:pointer; }
 /* Compact reader options fit the iPad beside the existing game controls. */
