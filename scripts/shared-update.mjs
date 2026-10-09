@@ -1,5 +1,6 @@
 
 import {execFileSync} from 'node:child_process';
+import {refreshVendorInstallation} from './refresh-vendor.mjs';
 import {mkdtempSync,readFileSync,existsSync,cpSync,rmSync,mkdirSync,writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';import {resolve,dirname,join} from 'node:path';import {fileURLToPath} from 'node:url';import {createHash} from 'node:crypto';
 const version=process.argv[process.argv.indexOf('--version')+1];
@@ -26,7 +27,7 @@ for(const project of ['emulingo','gamesenteneminer']){
  if(run('git',['status','--porcelain','--','vendor/lexirise-components'],dir).trim())throw new Error('Commit consumer vendor changes before updating.');
  mkdirSync(dirname(vendor),{recursive:true});if(existsSync(vendor))rmSync(vendor,{recursive:true});cpSync(join(temp,'package'),vendor,{recursive:true});
  const path=join(dir,'package.json'),pkg=JSON.parse(readFileSync(path,'utf8'));pkg.dependencies['@firebird55/lexirise-components']='file:vendor/lexirise-components';writeFileSync(path,JSON.stringify(pkg,null,2)+'\n');
- console.log(project+': '+version+' @ '+releasedCommit);console.log(run('npm',['install','--ignore-scripts'],dir));
+ console.log(project+': '+version+' @ '+releasedCommit);refreshVendorInstallation(dir,run);
  console.log(run('npm',['run','check'],dir));
  run('git',['add','package.json','package-lock.json','vendor/lexirise-components'],dir);
  if(run('git',['diff','--cached','--name-only'],dir).trim())console.log(run('git',['commit','-m','Update shared Lexirise components to '+version],dir));
