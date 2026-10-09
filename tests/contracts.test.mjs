@@ -40,7 +40,7 @@ test('language, translation and account cache isolation; UTF-16 ranges',async()=
  getValue:async(k,f)=>storage.has(k)?storage.get(k):f,setValue:async(k,v)=>storage.set(k,v),deleteValue:async k=>storage.delete(k),
  request:async(path,method,body)=>{calls.push({path,method,body});return {status:200,response: path==='/v1/settings'?account():{occurrences:[{word:'hello',charStart:2,charEnd:7,isWordLike:true,entryId:1}],entryMetaById:{1:{gloss:'word'}},stateByEntryId:{1:{proficiency:0}}}};}});
  for(const [source,translation] of [['en','fr'],['nl','en']]){const c=make(source,translation);await c.initializeClient();assert.equal((await c.analyze('😀hello')).tokens[0].start,2);await c.analyze('😀hello');}
- assert.equal(calls.filter(c=>c.path==='/v1/analyze/text').length,2);assert.equal(calls[0].body.language,'en');
+ assert.equal(calls.filter(c=>c.path==='/v1/analyze/text').length,2);assert.equal(calls.find(c=>c.path==='/v1/analyze/text').body.language,'en');
  const c=make('en','fr');await c.initializeClient();await c.loadSettings();assert.equal(calls.some(c=>c.method==='PATCH'),false);
  await c.patchSettings({global:{translationLanguage:'fr'}});assert.deepEqual(calls.at(-1).body,{global:{translationLanguage:'fr'}});
  await c.configureKey('fixture-account-B');await c.analyze('😀hello');assert.equal(calls.filter(c=>c.path==='/v1/analyze/text').length,3);
