@@ -25,6 +25,7 @@ for(const project of ['emulingo','gamesenteneminer']){
  const dir=join(siblings,project),vendor=join(dir,'vendor/lexirise-components');if(!existsSync(join(dir,'package.json')))throw new Error('Consumer missing: '+dir);
  if(run('git',['diff','--cached','--name-only'],dir).trim())throw new Error('Commit or unstage unrelated staged changes before updating consumers.');
  if(run('git',['status','--porcelain','--','vendor/lexirise-components'],dir).trim())throw new Error('Commit consumer vendor changes before updating.');
+ if(resolve(vendor)!==join(resolve(dir),'vendor','lexirise-components'))throw new Error('Vendor target escaped consumer workspace');
  mkdirSync(dirname(vendor),{recursive:true});if(existsSync(vendor))rmSync(vendor,{recursive:true});cpSync(join(temp,'package'),vendor,{recursive:true});
  const path=join(dir,'package.json'),pkg=JSON.parse(readFileSync(path,'utf8'));pkg.dependencies['@firebird55/lexirise-components']='file:vendor/lexirise-components';writeFileSync(path,JSON.stringify(pkg,null,2)+'\n');
  console.log(project+': '+version+' @ '+releasedCommit);refreshVendorInstallation(dir,run);

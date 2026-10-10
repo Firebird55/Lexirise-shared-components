@@ -5,3 +5,15 @@ release/
 .watch/
 *.log
 PROVENANCE.json
+
+# Private runtime and review material
+/data/
+/output/
+/work/
+/diagnostics/
+.env*
+*.dpapi
+*.db
+*.sqlite*
+*.key
+*.pem
