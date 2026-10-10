@@ -61,7 +61,7 @@ export function ReadingOptionsDialog({initial,onChange,onClose,sourceLanguage='z
  <ReadingOptionsControls value={local} sourceLanguage={sourceLanguage} onChange={next=>{setLocal(next);Promise.resolve(onChange(next)).catch(()=>setMessage('Could not save reading preferences.'));}}/>
  <p role="status">{message}</p></section></div>;
 }
-export function SettingsPanel({initial,onChange,onClose,adapter,connection,sourceLanguage='zh',sourceOverride=false}:{initial:LocalSettings;onChange:(settings:LocalSettings)=>void|Promise<void>;onClose:()=>void;adapter:SettingsAdapter;connection?:ReactNode;sourceLanguage?:StudyLanguage;sourceOverride?:boolean}) {
+export function SettingsPanel({initial,onChange,onClose,adapter,connection,sourceLanguage='zh',sourceOverride=false,showReadingOptions=true,title='Lexirise reading options'}:{initial:LocalSettings;onChange:(settings:LocalSettings)=>void|Promise<void>;onClose:()=>void;adapter:SettingsAdapter;connection?:ReactNode;sourceLanguage?:StudyLanguage;sourceOverride?:boolean;showReadingOptions?:boolean;title?:string}) {
  const focus=useDialogFocus();
  const [local,setLocal]=useState(initial),[original,setOriginal]=useState<AccountSettings|null>(null),[draft,setDraft]=useState<AccountSettings|null>(null),[editing,setEditing]=useState<StudyLanguage>(sourceLanguage),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
  async function reload(){setBusy(true);setMessage('');try{const result=validateAccount(await adapter.load());setOriginal(result);setDraft(structuredClone(result));}catch(e){setMessage(e instanceof Error?e.message:'Could not load settings.');}finally{setBusy(false);}}
@@ -74,10 +74,10 @@ export function SettingsPanel({initial,onChange,onClose,adapter,connection,sourc
  const cap=capabilities[editing];
  const languageView:JsonObject={readingAid:cap.readings[1]??null,readingAboveWords:cap.readings.length?true:null,script:cap.scripts[0]??null,
  inlineGlossMode:'off',coloringMode:'learning_state',toneColorPreset:cap.tones?'lexirise':null,customToneColors:cap.tones?null:undefined,colorKnownWordsToo:false,emphasizeFrequencyLevel:0,wordSpacing:'md',ttsOnWordClick:cap.tts,automaticGrammarHighlighting:cap.grammar?false:null,highlightProperNouns:true,customFont:'',fontSize:'md',segmentByCharacter:cap.characters?false:null,dictionariesEnabled:true,dictionaries:[],wordPopup:null,...draft?.languageSettings[editing]};
- return <div className="settings-backdrop" onClick={e=>{if(e.target===e.currentTarget)onClose();}}><section ref={focus} className="settings-dialog" role="dialog" aria-modal="true" aria-label="Lexirise reading options" onKeyDown={e=>e.stopPropagation()}>
+ return <div className="settings-backdrop" onClick={e=>{if(e.target===e.currentTarget)onClose();}}><section ref={focus} className="settings-dialog" role="dialog" aria-modal="true" aria-label={title} onKeyDown={e=>e.stopPropagation()}>
  <button className="settings-close" type="button" aria-label="Close Lexirise settings" onClick={onClose}>×</button>
- <h2>Lexirise reading options</h2><p className="settings-description">Local display changes apply immediately. Account changes require Save to Lexirise. Editing another study language does not change this transcript's language.</p>
- <ReadingOptionsControls value={local} onChange={updateLocal} sourceLanguage={sourceLanguage} sourceOverride={sourceOverride}/>{connection}
+ <h2>{title}</h2><p className="settings-description">Local display changes apply immediately. Account changes require Save to Lexirise. Editing another study language does not change this transcript's language.</p>
+ {showReadingOptions&&<ReadingOptionsControls value={local} onChange={updateLocal} sourceLanguage={sourceLanguage} sourceOverride={sourceOverride}/>}{connection}
  <fieldset className="settings-account"><legend>Lexirise account settings</legend>
  <div className="settings-actions"><button type="button" disabled={busy} onClick={()=>void reload()}>Reload from Lexirise</button><button type="button" disabled={busy||!draft} onClick={()=>void save()}>Save to Lexirise</button><button type="button" disabled={busy||!original} onClick={()=>{setDraft(structuredClone(original));setMessage('Account changes discarded.');}}>Discard account changes</button></div>
  <p role="status">{busy?'Contacting Lexirise…':message}</p>
