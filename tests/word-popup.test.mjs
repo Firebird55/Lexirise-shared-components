@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { normalizeWordPopupSettings, orderWordPopupTabs, orderWordPopupDefinitionSections, resolveInitialWordPopupTab, validateWordPopupPatch, popupPreferences, WordPopupControls, settingsPatch, createLexiriseClient } from '../dist/index.js';
+import { normalizeWordPopupSettings, orderWordPopupTabs, orderWordPopupDefinitionSections, resolveInitialWordPopupTab, validateWordPopupPatch, popupPreferences, popupOpensOnPointerEnter, popupTogglesOnShift, WORD_POPUP_OPEN_MODES, WordPopupControls, settingsPatch, createLexiriseClient } from '../dist/index.js';
 
 test('popup uses account ordering, disabled tabs, defaults and locked definition', () => {
  const layout=normalizeWordPopupSettings({tabs:[{id:'grammar',enabled:true},{id:'notes',enabled:false},{id:'definition',enabled:false}],openOn:'last'});
@@ -37,6 +37,34 @@ test('popup reads only its own language and global hover/disable settings', () =
 test('popup editor renders labeled reorder and enable controls without account writes', () => {
  const html=renderToStaticMarkup(React.createElement(WordPopupControls,{value:null,onChange:()=>{throw new Error('Rendering must not save');}}));
  assert.match(html,/Move grammar tabs up/);assert.match(html,/Definition sections/);assert.match(html,/Last used tab/);assert.match(html,/Definition tab[^>]+disabled/);
+});
+
+test('shift-hover honors only Shift and does not hijack modified or repeated keys', () => {
+ const plain={shiftKey:false,ctrlKey:false,metaKey:false,altKey:false};
+ const shift={...plain,shiftKey:true};
+ assert.deepEqual(WORD_POPUP_OPEN_MODES,['click','hover','shift-hover']);
+ for(const mode of WORD_POPUP_OPEN_MODES) {
+  assert.equal(popupOpensOnPointerEnter(mode,plain),mode==='hover');
+  assert.equal(popupOpensOnPointerEnter(mode,shift),mode!=='click');
+  assert.equal(popupTogglesOnShift(mode,{...shift,key:'Shift',repeat:false}),mode==='shift-hover');
+ }
+ for(const key of ['ctrlKey','metaKey','altKey']) {
+  const modified={...shift,[key]:true};
+  assert.equal(popupOpensOnPointerEnter('shift-hover',modified),false);
+  assert.equal(popupTogglesOnShift('shift-hover',{...modified,key:'Shift',repeat:false}),false);
+ }
+ assert.equal(popupTogglesOnShift('shift-hover',{...shift,key:'Shift',repeat:true}),false);
+ assert.equal(popupTogglesOnShift('shift-hover',{...shift,key:'A',repeat:false}),false);
+});
+
+test('shift-hover remains selected and changes only an explicitly edited account field', () => {
+ const before={languages:['zh'],global:{wordPopupOpenMode:'shift-hover'},languageSettings:{zh:{fontSize:'md'}}};
+ assert.equal(popupPreferences(before,'zh').openMode,'shift-hover');
+ assert.equal(popupPreferences(null,'zh').openMode,'click');
+ const after=structuredClone(before);after.languageSettings.zh.fontSize='lg';
+ assert.deepEqual(settingsPatch(before,after),{languageSettings:{zh:{fontSize:'lg'}}});
+ const changed=structuredClone(before);changed.global.wordPopupOpenMode='hover';
+ assert.deepEqual(settingsPatch(before,changed),{global:{wordPopupOpenMode:'hover'}});
 });
 test('Words and saved Notes use dictionary metadata and read-only vocabulary transport', async()=>{
  const calls=[];
